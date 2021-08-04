@@ -1,3 +1,16 @@
+# IntelliJ
+/.idea/
+
+/*.ipr
+/*.iws
+/**/*.iml
+
+# Visual Studio
+/.vs/
+
+# Visual Studio Code
+/.vscode/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
