@@ -215,7 +215,7 @@ func GetProcessDefinitionXMLByTenant(ctx context.Context, key, tenantId string) 
 // StartProcessDefinition instantiates a given process definition. Process variables and business
 // key may be supplied in the request body.
 func StartProcessDefinition(ctx context.Context, id string, trigger *ProcessInstanceTrigger) (*ProcessInstance, error) {
-	var reader *bytes.Reader
+	var reader io.Reader
 
 	var uri string
 	var payload []byte
@@ -249,7 +249,7 @@ exec:
 // StartProcessDefinitionByKey instantiates a given process definition. Process variables and business
 // key may be supplied in the request body. Starts the latest version of the process definition which belongs to no tenant.
 func StartProcessDefinitionByKey(ctx context.Context, key string, trigger *ProcessInstanceTrigger) (*ProcessInstance, error) {
-	var reader *bytes.Reader
+	var reader io.Reader
 
 	var uri string
 	var payload []byte
@@ -283,7 +283,7 @@ exec:
 // StartProcessDefinitionByTenant instantiates a given process definition. Process variables and business
 // key may be supplied in the request body. Starts the latest version of the process definition for tenant
 func StartProcessDefinitionByTenant(ctx context.Context, key, tenantId string, trigger *ProcessInstanceTrigger) (*ProcessInstance, error) {
-	var reader *bytes.Reader
+	var reader io.Reader
 
 	var uri string
 	var payload []byte
@@ -312,6 +312,30 @@ exec:
 	}
 
 	return result, nil
+}
+
+// GetProcessInstances queries for process instances that fulfill given parameters. Parameters may be
+// static as well as dynamic runtime properties of process instances. The size of the result set can
+// be retrieved by using the GetProcessInstancesCount method.
+func GetProcessInstances(ctx context.Context, tenantId string) ([]*ProcessInstance, error) {
+	var uri string
+	var err error
+
+	result := make([]*ProcessInstance, 0)
+
+	uri = fmt.Sprintf("%s/%s/process-instance?tenantIdIn=%s", url, path, tenantId)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
+// GetProcessInstancesCount ...
+func GetProcessInstancesCount(ctx context.Context) {
+
 }
 
 // GetTasks queries for tasks that fulfill a given filter. The size of the result set can be retrieved
@@ -424,17 +448,27 @@ func UnclaimTask(ctx context.Context, id string) error {
 
 // CompleteTask completes a task and updates process variables.
 func CompleteTask(ctx context.Context, id string, variables map[string]*Variable) error {
+	var reader io.Reader
+
 	var uri string
+	var payload []byte
 	var err error
 
-	payload, err := json.Marshal(&map[string]interface{}{"variables": variables})
+	if variables == nil {
+		goto exec
+	}
+
+	payload, err = json.Marshal(&map[string]interface{}{"variables": variables})
 
 	if err != nil {
 		return err
 	}
 
+	reader = bytes.NewReader(payload)
+
+exec:
 	uri = fmt.Sprintf("%s/%s/task/%s/complete", url, path, id)
-	err = client.send(ctx, uri, http.MethodPost, "application/json", bytes.NewReader(payload), nil)
+	err = client.send(ctx, uri, http.MethodPost, "application/json", reader, nil)
 
 	return err
 }
@@ -444,19 +478,52 @@ func CompleteTask(ctx context.Context, id string, variables map[string]*Variable
 // can be sent back to the owner. Can only be executed when the task has been delegated. The assignee
 // will be set to the owner, who performed the delegation.
 func ResolveTask(ctx context.Context, id string, variables map[string]*Variable) error {
+	var reader io.Reader
+
 	var uri string
+	var payload []byte
 	var err error
 
-	payload, err := json.Marshal(&map[string]interface{}{"variables": variables})
+	if variables == nil {
+		goto exec
+	}
+
+	payload, err = json.Marshal(&map[string]interface{}{"variables": variables})
 
 	if err != nil {
 		return err
 	}
 
+	reader = bytes.NewReader(payload)
+
+exec:
 	uri = fmt.Sprintf("%s/%s/task/%s/resolve", url, path, id)
-	err = client.send(ctx, uri, http.MethodPost, "application/json", bytes.NewReader(payload), nil)
+	err = client.send(ctx, uri, http.MethodPost, "application/json", reader, nil)
 
 	return err
+}
+
+// GetTenants query for a list of tenants using a list of parameters. The size of the result
+// set can be retrieved by using the GetTenantsCount method.
+func GetTenants(ctx context.Context) ([]*Tenant, error) {
+	var uri string
+	var err error
+
+	result := make([]*Tenant, 0)
+
+	uri = fmt.Sprintf("%s/%s/tenant", url, path)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
+// GetTenantsCount ...
+func GetTenantsCount(ctx context.Context) {
+
 }
 
 // GetTenant retrieves a Tenant.

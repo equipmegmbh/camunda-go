@@ -340,16 +340,16 @@ type Task struct {
 	Priority int `json:"priority,omitempty"`
 
 	// The id of the process definition the task belongs to.
-	ProcessDefinitionId int `json:"processDefinitionId,omitempty"`
+	ProcessDefinitionId string `json:"processDefinitionId,omitempty"`
 
 	// The id of the process instance the task belongs to.
-	ProcessInstanceId bool `json:"processInstanceId,omitempty"`
+	ProcessInstanceId string `json:"processInstanceId,omitempty"`
 
 	// The id of the case execution the task belongs to.
 	CaseExecutionId string `json:"caseExecutionId,omitempty"`
 
 	// The id of the case definition the task belongs to.
-	CaseDefinitionId int `json:"caseDefinitionId,omitempty"`
+	CaseDefinitionId string `json:"caseDefinitionId,omitempty"`
 
 	// The id of the case instance the task belongs to.
 	CaseInstanceId string `json:"caseInstanceId,omitempty"`
