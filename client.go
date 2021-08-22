@@ -21,19 +21,16 @@ func (c *Client) init() {
 
 }
 
-func (c *Client) send(ctx context.Context, url, method string, payload io.Reader, out interface{}) error {
+func (c *Client) authorize(ctx context.Context) (*Token, error) {
+	return new(Token), nil
+}
+
+func (c *Client) send(ctx context.Context, url, method, ct string, payload io.Reader, out interface{}) error {
 	c.once.Do(c.init)
 
 	var content []byte
-	var count int
 	var err error
-	/*
-		token, err := c.authorize(ctx)
 
-		if err != nil {
-			return err
-		}
-	*/
 	var req *http.Request
 	var resp *http.Response
 
@@ -44,12 +41,9 @@ func (c *Client) send(ctx context.Context, url, method string, payload io.Reader
 	}
 
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	//req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	req.Header.Set("Content-Type", ct)
 
-send:
 	resp, err = c.cli.Do(req)
-	count = count + 1
 
 	if err != nil {
 		return err
@@ -57,10 +51,6 @@ send:
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		goto ok
-	}
-
-	if resp.StatusCode == 500 && count < 5 {
-		goto send
 	}
 
 	//goland:noinspection GoUnhandledErrorResult
@@ -88,6 +78,10 @@ unknown:
 ok:
 	//goland:noinspection GoUnhandledErrorResult
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
 
 	content, err = ioutil.ReadAll(utfbom.SkipOnly(resp.Body))
 

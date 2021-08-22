@@ -6,6 +6,135 @@ import (
 
 //goland:noinspection GoUnusedConst,GoNameStartsWithPackageName
 
+type CaseDefinition struct {
+	// The id of the process definition.
+	Id string `json:"id,omitempty"`
+
+	// The key of the process definition.
+	Key string `json:"key,omitempty"`
+
+	// The category of the process definition.
+	Category string `json:"category,omitempty"`
+
+	// The name of the process definition.
+	Name string `json:"name,omitempty"`
+
+	// The version of the process definition that the engine assigned to it.
+	Version int `json:"version,omitempty"`
+
+	// The file name of the process definition.
+	Resource string `json:"resource,omitempty"`
+
+	// The deployment id of the process definition.
+	DeploymentId string `json:"deploymentId,omitempty"`
+
+	// The tenant id of the process definition.
+	TenantId string `json:"tenantId,omitempty"`
+
+	// History time to live value of the process definition.
+	HistoryTimeToLive int `json:"historyTimeToLive,omitempty"`
+}
+
+type Deployment struct {
+	// The id of the deployment.
+	Id string `json:"id,omitempty"`
+
+	// The name of the deployment.
+	Name string `json:"name,omitempty"`
+
+	// The source of the deployment.
+	Source string `json:"source,omitempty"`
+
+	// The tenant id of the deployment.
+	TenantId string `json:"tenantId,omitempty"`
+
+	// The time when the deployment was created.
+	DeploymentTime string `json:"deploymentTime,omitempty"`
+
+	// An object containing a property for each of the
+	// process definitions, which are successfully deployed with that deployment.
+	DeployedProcessDefinitions map[string]*ProcessDefinition `json:"deployedProcessDefinitions,omitempty"`
+
+	// An object containing a property for each of the case
+	// definitions, which are successfully deployed with that deployment.
+	DeployedCaseDefinitions map[string]*CaseDefinition `json:"deployedCaseDefinitions,omitempty"`
+
+	// An object containing a property for each of the decision
+	// definitions, which are successfully deployed with that deployment.
+	DeployedDecisionDefinitions map[string]*DecisionDefinition `json:"deployedDecisionDefinitions,omitempty"`
+
+	// An object containing a property for each of the decision
+	// requirements definitions, which are successfully deployed with that deployment.
+	DeployedDecisionRequirementsDefinitions map[string]*DecisionRequirementsDefinition `json:"deployedDecisionRequirementsDefinitions,omitempty"`
+
+	// Link to the newly created deployment with method, href and rel.
+	Links []*Link `json:"links,omitempty"`
+}
+
+type DecisionDefinition struct {
+	// The id of the process definition.
+	Id string `json:"id,omitempty"`
+
+	// The key of the process definition.
+	Key string `json:"key,omitempty"`
+
+	// The category of the process definition.
+	Category string `json:"category,omitempty"`
+
+	// The name of the process definition.
+	Name string `json:"name,omitempty"`
+
+	// The version of the process definition that the engine assigned to it.
+	Version int `json:"version,omitempty"`
+
+	// The file name of the process definition.
+	Resource string `json:"resource,omitempty"`
+
+	// The deployment id of the process definition.
+	DeploymentId string `json:"deploymentId,omitempty"`
+
+	// The id of the decision requirements definition this decision definition belongs to.
+	DecisionRequirementsDefinitionId string `json:"decisionRequirementsDefinitionId,omitempty"`
+
+	// The key of the decision requirements definition this decision definition belongs to.
+	DecisionRequirementsDefinitionKey string `json:"decisionRequirementsDefinitionKey,omitempty"`
+
+	// The tenant id of the process definition.
+	TenantId string `json:"tenantId,omitempty"`
+
+	// The version tag of the process definition.
+	VersionTag string `json:"versionTag,omitempty"`
+
+	// History time to live value of the process definition.
+	HistoryTimeToLive int `json:"historyTimeToLive,omitempty"`
+}
+
+type DecisionRequirementsDefinition struct {
+	// The id of the process definition.
+	Id string `json:"id,omitempty"`
+
+	// The key of the process definition.
+	Key string `json:"key,omitempty"`
+
+	// The category of the process definition.
+	Category string `json:"category,omitempty"`
+
+	// The name of the process definition.
+	Name string `json:"name,omitempty"`
+
+	// The version of the process definition that the engine assigned to it.
+	Version int `json:"version,omitempty"`
+
+	// The file name of the process definition.
+	Resource string `json:"resource,omitempty"`
+
+	// The deployment id of the process definition.
+	DeploymentId string `json:"deploymentId,omitempty"`
+
+	// The tenant id of the process definition.
+	TenantId string `json:"tenantId,omitempty"`
+}
+
 type Error struct {
 	// The type of exception.
 	Type string `json:"type,omitempty"`
@@ -33,65 +162,319 @@ type Fetch struct {
 	Topics []*Topic `json:"topics,omitempty"`
 }
 
-type Task struct {
-	// The id of the external task.
+type Link struct {
+	// The link method.
+	Method string `json:"method,omitempty"`
+
+	// The link href.
+	Ref string `json:"href,omitempty"`
+
+	// The link relation.
+	Rel string `json:"rel,omitempty"`
+}
+
+type ProcessDefinition struct {
+	// The id of the process definition.
 	Id string `json:"id,omitempty"`
 
-	// The id of the activity that this external task belongs to.
-	ActivityId string `json:"activityId,omitempty"`
+	// The key of the process definition.
+	Key string `json:"key,omitempty"`
 
-	// The id of the activity instance that the external task belongs to.
-	ActivityInstanceId string `json:"activityInstanceId,omitempty"`
+	// The category of the process definition.
+	Category string `json:"category,omitempty"`
 
-	// The full error message submitted with the latest reported failure executing this task;
-	// null if no failure was reported previously or if no error message was submitted.
-	ErrorMessage string `json:"errorMessage,omitempty"`
+	// The description of the process definition.
+	Description string `json:"description,omitempty"`
 
-	// The error details submitted with the latest reported failure executing this task.
-	// null if no failure was reported previously or if no error details was submitted.
-	ErrorDetails string `json:"errorDetails,omitempty"`
+	// The name of the process definition.
+	Name string `json:"name,omitempty"`
 
-	// The id of the execution that the external task belongs to.
-	ExecutionId string `json:"executionId,omitempty"`
+	// The version of the process definition that the engine assigned to it.
+	Version int `json:"version,omitempty"`
 
-	// The date that the task's most recent lock expires or has expired.
-	LockExpirationTime string `json:"lockExpirationTime,omitempty"`
+	// The file name of the process definition.
+	Resource string `json:"resource,omitempty"`
 
-	// The id of the process definition the external task is defined in.
-	ProcessDefinitionId string `json:"processDefinitionId,omitempty"`
+	// The deployment id of the process definition.
+	DeploymentId string `json:"deploymentId,omitempty"`
 
-	// The key of the process definition the external task is defined in.
-	ProcessDefinitionKey string `json:"processDefinitionKey,omitempty"`
+	// The file name of the process definition diagram, if it exists.
+	Diagram string `json:"diagram,omitempty"`
 
-	// The version tag of the process definition the external task is defined in.
-	ProcessDefinitionVersionTag string `json:"processDefinitionVersionTag,omitempty"`
-
-	// The id of the process instance the external task belongs to.
-	ProcessInstanceId string `json:"processInstanceId,omitempty"`
-
-	// The id of the tenant the external task belongs to.
-	TenantId string `json:"tenantId,omitempty"`
-
-	// The number of retries the task currently has left.
-	Retries int `json:"retries,omitempty"`
-
-	// Whether the process instance the external task belongs to is suspended.
+	// A flag indicating whether the definition is suspended or not.
 	Suspended bool `json:"suspended,omitempty"`
 
-	// The id of the worker that possesses or possessed the most recent lock.
-	WorkerId string `json:"workerId,omitempty"`
+	// The tenant id of the process definition.
+	TenantId string `json:"tenantId,omitempty"`
 
-	// The priority of the external task.
-	Priority int `json:"priority,omitempty"`
+	// The version tag of the process definition.
+	VersionTag string `json:"versionTag,omitempty"`
 
-	// The topic name of the external task.
-	TopicName string `json:"topicName,omitempty"`
+	// History time to live value of the process definition.
+	HistoryTimeToLive int `json:"historyTimeToLive,omitempty"`
 
-	// The business key of the process instance the external task belongs to.
+	// A flag indicating whether the process definition is startable in Tasklist or not.
+	StartableInTasklist bool `json:"startableInTasklist,omitempty"`
+}
+
+type ProcessDefinitionSource struct {
+	// The id of the process definition.
+	Id string `json:"id,omitempty"`
+
+	// An escaped XML string containing the XML that this definition was deployed with.
+	Content string `json:"bpmn20Xml,omitempty"`
+}
+
+type ProcessInstance struct {
+	// The id of the process definition.
+	Id string `json:"id,omitempty"`
+
+	// The id of the process definition.
+	DefinitionId string `json:"definitionId,omitempty"`
+
+	// The business key of the process instance.
 	BusinessKey string `json:"businessKey,omitempty"`
 
-	// The properties for each of the requested variables.
+	// The case instance id of the process instance.
+	CaseInstanceId string `json:"caseInstanceId,omitempty"`
+
+	// The tenant id of the process instance.
+	TenantId string `json:"tenantId,omitempty"`
+
+	// A flag indicating whether the instance is still running or not.
+	Ended bool `json:"ended,omitempty"`
+
+	// A flag indicating whether the instance is suspended or not.
+	Suspended bool `json:"suspended,omitempty"`
+
+	// An array containing links to interact with the instance.
+	Links []*Link `json:"links,omitempty"`
+
+	// An object containing a property for each of the latest variables.
 	Variables map[string]*Variable `json:"variables,omitempty"`
+}
+
+type ProcessInstanceTrigger struct {
+	// The business key the process instance is to be initialized with. The business key uniquely
+	// identifies the process instance in the context of the given process definition.
+	BusinessKey string `json:"businessKey,omitempty"`
+
+	// The case instance id the process instance is to be initialized with.
+	CaseInstanceId string `json:"caseInstanceId,omitempty"`
+
+	// Skip execution listener invocation for activities that are started
+	// or ended as part of this request.
+	SkipCustomListeners bool `json:"skipCustomListeners,omitempty"`
+
+	// Skip execution of input/output variable mappings for activities that are
+	// started or ended as part of this request.
+	SkipIoMappings bool `json:"skipIoMappings,omitempty"`
+
+	// Indicates if the variables, which was used by the process instance during
+	// execution, should be returned. Default value: false
+	WithVariablesInReturn bool `json:"withVariablesInReturn,omitempty"`
+
+	// An array of instructions that specify which activities to start the process
+	// instance at. If this property is omitted, the process instance starts at its default blank start event.
+	StartInstructions []*StartInstruction `json:"startInstructions,omitempty"`
+
+	// An object containing a property for each of the latest variables.
+	Variables map[string]*Variable `json:"variables,omitempty"`
+}
+
+type StartInstruction struct {
+	// Mandatory. One of the following values: 'startBeforeActivity', 'startAfterActivity', 'startTransition'.
+	// A 'startBeforeActivity' instruction requests to start execution before entering a given
+	// activity. A 'startAfterActivity' instruction requests to start at the single outgoing sequence
+	// flow of a given activity. A 'startTransition' instruction requests to execute a specific sequence flow.
+	Type string `json:"type,omitempty"`
+
+	// Specifies the activity the instruction targets. Can be used with instructions
+	// of types 'startBeforeActivity' and 'startAfterActivity'.
+	ActivityId string `json:"activityId,omitempty"`
+
+	// Specifies the sequence flow to start. Can be used with
+	// instructions of types 'startTransition'.
+	TransitionId string `json:"transitionId,omitempty"`
+
+	// An object containing variable key-value pairs. Can be used with instructions
+	// of type 'startBeforeActivity', 'startAfterActivity', and 'startTransition'.
+	Variables map[string]*Variable `json:"variables,omitempty"`
+}
+
+type Task struct {
+	// The task id.
+	Id string `json:"id,omitempty"`
+
+	// The task name.
+	Name string `json:"name,omitempty"`
+
+	// The assignee's id.
+	Assignee string `json:"assignee,omitempty"`
+
+	// The owner's id.
+	Owner string `json:"owner,omitempty"`
+
+	// The date the task was created on. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	Created string `json:"created,omitempty"`
+
+	// The task's due date. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	Due string `json:"due,omitempty"`
+
+	// The follow-up date for the task. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	FollowUp string `json:"followUp,omitempty"`
+
+	// The task's delegation state. Possible values are PENDING and RESOLVED.
+	DelegationState string `json:"delegationState,omitempty"`
+
+	// The task's description.
+	Description string `json:"description,omitempty"`
+
+	// The id of the execution the task belongs to.
+	ExecutionId string `json:"executionId,omitempty"`
+
+	// The id the parent task, if this task is a subtask.
+	ParentTaskId string `json:"parentTaskId,omitempty"`
+
+	// The task's priority.
+	Priority int `json:"priority,omitempty"`
+
+	// The id of the process definition the task belongs to.
+	ProcessDefinitionId int `json:"processDefinitionId,omitempty"`
+
+	// The id of the process instance the task belongs to.
+	ProcessInstanceId bool `json:"processInstanceId,omitempty"`
+
+	// The id of the case execution the task belongs to.
+	CaseExecutionId string `json:"caseExecutionId,omitempty"`
+
+	// The id of the case definition the task belongs to.
+	CaseDefinitionId int `json:"caseDefinitionId,omitempty"`
+
+	// The id of the case instance the task belongs to.
+	CaseInstanceId string `json:"caseInstanceId,omitempty"`
+
+	// The task's key.
+	TaskDefinitionKey string `json:"taskDefinitionKey,omitempty"`
+
+	// Whether the task belongs to a process instance that is suspended.
+	Suspended bool `json:"suspended,omitempty"`
+
+	// If not null, the form key for the task.
+	FormKey string `json:"formKey,omitempty"`
+
+	// If not null, the tenant id of the task.
+	TenantId string `json:"tenantId,omitempty"`
+}
+
+type TaskHistory struct {
+	// The task id.
+	Id string `json:"id,omitempty"`
+
+	// The key of the process definition the task belongs to.
+	ProcessDefinitionKey string `json:"processDefinitionKey,omitempty"`
+
+	// The id of the process definition the task belongs to.
+	ProcessDefinitionId string `json:"processDefinitionId,omitempty"`
+
+	// The id of the process instance the task belongs to.
+	ProcessInstanceId string `json:"processInstanceId	,omitempty"`
+
+	// The id of the execution the task belongs to.
+	ExecutionId string `json:"executionId,omitempty"`
+
+	// The key of the case definition the task belongs to.
+	CaseDefinitionKey string `json:"caseDefinitionKey,omitempty"`
+
+	// The id of the case definition the task belongs to.
+	CaseDefinitionId string `json:"caseDefinitionId,omitempty"`
+
+	// The id of the case instance the task belongs to.
+	CaseInstanceId string `json:"caseInstanceId,omitempty"`
+
+	// The id of the case execution the task belongs to.
+	CaseExecutionId string `json:"caseExecutionId,omitempty"`
+
+	// The id of the activity that this object is an instance of.
+	ActivityInstanceId string `json:"activityInstanceId,omitempty"`
+
+	// The task name.
+	Name string `json:"name,omitempty"`
+
+	// The task's description.
+	Description string `json:"description,omitempty"`
+
+	// The task's delete reason.
+	DeleteReason string `json:"deleteReason,omitempty"`
+
+	// The owner's id.
+	Owner string `json:"owner,omitempty"`
+
+	// The assignee's id.
+	Assignee string `json:"assignee,omitempty"`
+
+	// The time the task was started. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	StartTime string `json:"startTime,omitempty"`
+
+	// The time the task ended. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	EndTime string `json:"endTime,omitempty"`
+
+	// The time the task took to finish (in milliseconds).
+	Duration int `json:"duration,omitempty"`
+
+	// The task's key.
+	TaskDefinitionKey string `json:"taskDefinitionKey,omitempty"`
+
+	// The task's priority.
+	Priority int `json:"priority,omitempty"`
+
+	// The task's due date. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	Due string `json:"due,omitempty"`
+
+	// The id of the parent task, if this task is a subtask.
+	ParentTaskId string `json:"parentTaskId,omitempty"`
+
+	// The follow-up date for the task. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	FollowUp string `json:"followUp,omitempty"`
+
+	// The tenant id of the task instance.
+	TenantId string `json:"tenantId,omitempty"`
+
+	// The time after which the task should be removed by the History Cleanup job.
+	// Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+	RemovalTime string `json:"removalTime,omitempty"`
+
+	// The process instance id of the root process instance that initiated the
+	// process containing this task.
+	RootProcessInstanceId string `json:"rootProcessInstanceId,omitempty"`
+}
+
+type Tenant struct {
+	// The id of the tenant.
+	Id string `json:"id,omitempty"`
+
+	// The name of the tenant.
+	Name string `json:"name,omitempty"`
+}
+
+type Token struct {
+	// ...
+	Kind string `json:"token_type,omitempty"`
+
+	// ...
+	Scope string `json:"scope,omitempty"`
+
+	// ...
+	ExpiresIn int32 `json:"expires_in,string"`
+
+	// ...
+	ExpiresOn int64 `json:"expires_on,string"`
+
+	// ...
+	AccessToken string `json:"access_token,omitempty"`
+
+	// ...
+	RefreshToken string `json:"refresh_token,omitempty"`
 }
 
 type Topic struct {
@@ -135,11 +518,17 @@ type Topic struct {
 }
 
 type Variable struct {
+	// Indicates whether the variable should be a local variable or not.
+	Local bool `json:"local,omitempty"`
+
 	// The value type of the variable.
 	Type string `json:"type,omitempty"`
 
 	// The variable's value.
 	Value interface{} `json:"value,omitempty"`
+
+	// An object containing additional, value-type-dependent properties.
+	ValueInfo interface{} `json:"valueInfo,omitempty"`
 }
 
 func (e *Error) Error() string {
