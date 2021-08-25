@@ -401,6 +401,24 @@ func GetTask(ctx context.Context, id string) (*Task, error) {
 	return result, err
 }
 
+// GetTaskVariables retrieves all variables visible from the task. A variable is visible from the task if it is a
+// local task variable or declared in a parent scope of the task.
+func GetTaskVariables(ctx context.Context, id string) ([]*Variable, error) {
+	var uri string
+	var err error
+
+	result := make([]*Variable, 0)
+
+	uri = fmt.Sprintf("%s/%s/task/%s/variables", url, path, id)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
 // ClaimTask claims a task for a specific user.
 func ClaimTask(ctx context.Context, id, userId string) error {
 	var uri string
