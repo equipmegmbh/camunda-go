@@ -430,21 +430,14 @@ func GetProcessInstancesCount(ctx context.Context) {
 
 }
 
-// GetUserOperations queries for user operation log entries that fulfill the given parameters. The
-// size of the result set can be retrieved by using the GetUserOperationsCount method.
-// Note that the properties of operation log entries are interpreted as restrictions on the
-// entities they apply to. That means, if a single process instance is updated, the field
-// processInstanceId is populated. If a single operation updates all process instances of the
-// same process definition, the field processInstanceId is null (a null restriction is viewed
-// as a wildcard, i.e., matches a process instance with any id) and the field processDefinitionId
-// is populated. This way, which entities were changed by a user operation can easily be reconstructed.
-func GetUserOperations(ctx context.Context, taskId string) ([]*UserOperationLog, error) {
+// GetProcessInstance retrieves a process instance by id, according to the ProcessInstance interface in the engine.
+func GetProcessInstance(ctx context.Context, id string) (*ProcessInstance, error) {
 	var uri string
 	var err error
 
-	result := make([]*UserOperationLog, 0)
+	result := new(ProcessInstance)
 
-	uri = fmt.Sprintf("%s/%s/history/user-operation?taskId=%s", url, path, taskId)
+	uri = fmt.Sprintf("%s/%s/process-instance/%s", url, path, id)
 	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
 
 	if err != nil {
@@ -454,9 +447,15 @@ func GetUserOperations(ctx context.Context, taskId string) ([]*UserOperationLog,
 	return result, err
 }
 
-// GetUserOperationsCount ...
-func GetUserOperationsCount(ctx context.Context) {
+// DeleteProcessInstance deletes a running process instance by id.
+func DeleteProcessInstance(ctx context.Context, id string) error {
+	var uri string
+	var err error
 
+	uri = fmt.Sprintf("%s/%s/process-instance/%s", url, path, id)
+	err = client.send(ctx, uri, http.MethodDelete, "application/json", nil, nil)
+
+	return err
 }
 
 // GetTasks queries for tasks that fulfill a given filter. The size of the result set can be retrieved
@@ -782,4 +781,33 @@ func DeleteTenant(ctx context.Context, id string) error {
 	err = client.send(ctx, uri, http.MethodDelete, "application/json", nil, nil)
 
 	return err
+}
+
+// GetUserOperations queries for user operation log entries that fulfill the given parameters. The
+// size of the result set can be retrieved by using the GetUserOperationsCount method.
+// Note that the properties of operation log entries are interpreted as restrictions on the
+// entities they apply to. That means, if a single process instance is updated, the field
+// processInstanceId is populated. If a single operation updates all process instances of the
+// same process definition, the field processInstanceId is null (a null restriction is viewed
+// as a wildcard, i.e., matches a process instance with any id) and the field processDefinitionId
+// is populated. This way, which entities were changed by a user operation can easily be reconstructed.
+func GetUserOperations(ctx context.Context, taskId string) ([]*UserOperationLog, error) {
+	var uri string
+	var err error
+
+	result := make([]*UserOperationLog, 0)
+
+	uri = fmt.Sprintf("%s/%s/history/user-operation?taskId=%s", url, path, taskId)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
+// GetUserOperationsCount ...
+func GetUserOperationsCount(ctx context.Context) {
+
 }
