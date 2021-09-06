@@ -214,18 +214,18 @@ func GetProcessDefinitionXMLByTenant(ctx context.Context, key, tenantId string) 
 
 // StartProcessDefinition instantiates a given process definition. Process variables and business
 // key may be supplied in the request body.
-func StartProcessDefinition(ctx context.Context, id string, trigger *ProcessInstanceTrigger) (*ProcessInstance, error) {
+func StartProcessDefinition(ctx context.Context, id string, data *ProcessDefinitionStart) (*ProcessInstance, error) {
 	var reader io.Reader
 
 	var uri string
 	var payload []byte
 	var err error
 
-	if trigger == nil {
+	if data == nil {
 		goto exec
 	}
 
-	payload, err = json.Marshal(trigger)
+	payload, err = json.Marshal(data)
 
 	if err != nil {
 		return nil, err
@@ -248,18 +248,18 @@ exec:
 
 // StartProcessDefinitionByKey instantiates a given process definition. Process variables and business
 // key may be supplied in the request body. Starts the latest version of the process definition which belongs to no tenant.
-func StartProcessDefinitionByKey(ctx context.Context, key string, trigger *ProcessInstanceTrigger) (*ProcessInstance, error) {
+func StartProcessDefinitionByKey(ctx context.Context, key string, data *ProcessDefinitionStart) (*ProcessInstance, error) {
 	var reader io.Reader
 
 	var uri string
 	var payload []byte
 	var err error
 
-	if trigger == nil {
+	if data == nil {
 		goto exec
 	}
 
-	payload, err = json.Marshal(trigger)
+	payload, err = json.Marshal(data)
 
 	if err != nil {
 		return nil, err
@@ -282,18 +282,18 @@ exec:
 
 // StartProcessDefinitionByTenant instantiates a given process definition. Process variables and business
 // key may be supplied in the request body. Starts the latest version of the process definition for tenant
-func StartProcessDefinitionByTenant(ctx context.Context, key, tenantId string, trigger *ProcessInstanceTrigger) (*ProcessInstance, error) {
+func StartProcessDefinitionByTenant(ctx context.Context, key, tenantId string, data *ProcessDefinitionStart) (*ProcessInstance, error) {
 	var reader io.Reader
 
 	var uri string
 	var payload []byte
 	var err error
 
-	if trigger == nil {
+	if data == nil {
 		goto exec
 	}
 
-	payload, err = json.Marshal(trigger)
+	payload, err = json.Marshal(data)
 
 	if err != nil {
 		return nil, err
@@ -312,6 +312,98 @@ exec:
 	}
 
 	return result, nil
+}
+
+// ActivateProcessDefinition activates a given process definition by id.
+func ActivateProcessDefinition(ctx context.Context, id, date string, includeProcessInstances bool) error {
+	var uri string
+	var err error
+
+	data := make(map[string]interface{})
+
+	data["suspended"] = false
+	data["includeProcessInstances"] = includeProcessInstances
+	data["executionDate"] = date
+
+	payload, err := json.Marshal(data)
+
+	if err != nil {
+		return err
+	}
+
+	uri = fmt.Sprintf("%s/%s/process-definition/%s/suspended", url, path, id)
+	err = client.send(ctx, uri, http.MethodPut, "application/json", bytes.NewReader(payload), nil)
+
+	return err
+}
+
+// SuspendProcessDefinition suspends a given process definition by id.
+func SuspendProcessDefinition(ctx context.Context, id, date string, includeProcessInstances bool) error {
+	var uri string
+	var err error
+
+	data := make(map[string]interface{})
+
+	data["suspended"] = true
+	data["includeProcessInstances"] = includeProcessInstances
+	data["executionDate"] = date
+
+	payload, err := json.Marshal(data)
+
+	if err != nil {
+		return err
+	}
+
+	uri = fmt.Sprintf("%s/%s/process-definition/%s/suspended", url, path, id)
+	err = client.send(ctx, uri, http.MethodPut, "application/json", bytes.NewReader(payload), nil)
+
+	return err
+}
+
+// RestartProcessDefinition restarts process instances that were canceled or terminated
+// synchronously. Can also restart completed process instances. It will create a new
+// instance using the original instance information. To execute the restart asynchronously,
+// use the RestartProcessDefinitionAsync method.
+func RestartProcessDefinition(ctx context.Context, id string, data *ProcessDefinitionRestart) error {
+	var uri string
+	var err error
+
+	payload, err := json.Marshal(data)
+
+	if err != nil {
+		return err
+	}
+
+	uri = fmt.Sprintf("%s/%s/process-definition/%s/restart", url, path, id)
+	err = client.send(ctx, uri, http.MethodPost, "application/json", bytes.NewReader(payload), nil)
+
+	return err
+}
+
+// RestartProcessDefinitionAsync restarts process instances that were canceled or terminated
+// asynchronously. Can also restart completed process instances. It will create a new
+// instance using the original instance information. To execute the restart synchronously,
+// use the RestartProcessDefinition method.
+func RestartProcessDefinitionAsync(ctx context.Context, id string, data *ProcessDefinitionRestart) (*Batch, error) {
+	var uri string
+	var err error
+
+	payload, err := json.Marshal(data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(Batch)
+
+	uri = fmt.Sprintf("%s/%s/process-definition/%s/restart-async", url, path, id)
+	err = client.send(ctx, uri, http.MethodPost, "application/json", bytes.NewReader(payload), result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
 }
 
 // GetProcessInstances queries for process instances that fulfill given parameters. Parameters may be
@@ -335,6 +427,35 @@ func GetProcessInstances(ctx context.Context, tenantId string) ([]*ProcessInstan
 
 // GetProcessInstancesCount ...
 func GetProcessInstancesCount(ctx context.Context) {
+
+}
+
+// GetUserOperations queries for user operation log entries that fulfill the given parameters. The
+// size of the result set can be retrieved by using the GetUserOperationsCount method.
+// Note that the properties of operation log entries are interpreted as restrictions on the
+// entities they apply to. That means, if a single process instance is updated, the field
+// processInstanceId is populated. If a single operation updates all process instances of the
+// same process definition, the field processInstanceId is null (a null restriction is viewed
+// as a wildcard, i.e., matches a process instance with any id) and the field processDefinitionId
+// is populated. This way, which entities were changed by a user operation can easily be reconstructed.
+func GetUserOperations(ctx context.Context, taskId string) ([]*UserOperationLog, error) {
+	var uri string
+	var err error
+
+	result := make([]*UserOperationLog, 0)
+
+	uri = fmt.Sprintf("%s/%s/history/user-operation?taskId=%s", url, path, taskId)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
+// GetUserOperationsCount ...
+func GetUserOperationsCount(ctx context.Context) {
 
 }
 
@@ -464,33 +585,6 @@ func UnclaimTask(ctx context.Context, id string) error {
 	return err
 }
 
-// CompleteTask completes a task and updates process variables.
-func CompleteTask(ctx context.Context, id string, variables map[string]*Variable) error {
-	var reader io.Reader
-
-	var uri string
-	var payload []byte
-	var err error
-
-	if variables == nil {
-		goto exec
-	}
-
-	payload, err = json.Marshal(&map[string]interface{}{"variables": variables})
-
-	if err != nil {
-		return err
-	}
-
-	reader = bytes.NewReader(payload)
-
-exec:
-	uri = fmt.Sprintf("%s/%s/task/%s/complete", url, path, id)
-	err = client.send(ctx, uri, http.MethodPost, "application/json", reader, nil)
-
-	return err
-}
-
 // ResolveTask resolves a task and updates execution variables.
 // Resolving a task marks that the assignee is done with the task delegated to them, and that it
 // can be sent back to the owner. Can only be executed when the task has been delegated. The assignee
@@ -519,6 +613,90 @@ exec:
 	err = client.send(ctx, uri, http.MethodPost, "application/json", reader, nil)
 
 	return err
+}
+
+// CompleteTask completes a task and updates process variables.
+func CompleteTask(ctx context.Context, id string, variables map[string]*Variable) error {
+	var reader io.Reader
+
+	var uri string
+	var payload []byte
+	var err error
+
+	if variables == nil {
+		goto exec
+	}
+
+	payload, err = json.Marshal(&map[string]interface{}{"variables": variables})
+
+	if err != nil {
+		return err
+	}
+
+	reader = bytes.NewReader(payload)
+
+exec:
+	uri = fmt.Sprintf("%s/%s/task/%s/complete", url, path, id)
+	err = client.send(ctx, uri, http.MethodPost, "application/json", reader, nil)
+
+	return err
+}
+
+// GetTaskComments gets the comments for a task by id.
+func GetTaskComments(ctx context.Context, id string) ([]*Comment, error) {
+	var uri string
+	var err error
+
+	result := make([]*Comment, 0)
+
+	uri = fmt.Sprintf("%s/%s/task/%s/comment", url, path, id)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
+// GetTaskComment retrieves a task comment by task id and comment id.
+func GetTaskComment(ctx context.Context, id, commentId string) (*Comment, error) {
+	var uri string
+	var err error
+
+	result := new(Comment)
+
+	uri = fmt.Sprintf("%s/%s/task/%s/comment/%s", url, path, id, commentId)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
+// CreateTaskComment creates a comment for a task by id.
+func CreateTaskComment(ctx context.Context, id, message string) (*Comment, error) {
+	var uri string
+	var err error
+
+	payload, err := json.Marshal(&map[string]string{"message": message})
+
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(Comment)
+
+	uri = fmt.Sprintf("%s/%s/task/%s/comment/create", url, path, id)
+	err = client.send(ctx, uri, http.MethodPost, "application/json", bytes.NewReader(payload), result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
 }
 
 // GetTenants query for a list of tenants using a list of parameters. The size of the result
@@ -574,6 +752,34 @@ func CreateTenant(ctx context.Context, tenant *Tenant) error {
 
 	uri = fmt.Sprintf("%s/%s/tenant/create", url, path)
 	err = client.send(ctx, uri, http.MethodPost, "application/json", bytes.NewReader(payload), nil)
+
+	return err
+}
+
+// UpdateTenant updates a given Tenant.
+func UpdateTenant(ctx context.Context, id string, tenant *Tenant) error {
+	var uri string
+	var err error
+
+	payload, err := json.Marshal(tenant)
+
+	if err != nil {
+		return err
+	}
+
+	uri = fmt.Sprintf("%s/%s/tenant/%s", url, path, id)
+	err = client.send(ctx, uri, http.MethodPut, "application/json", bytes.NewReader(payload), nil)
+
+	return err
+}
+
+// DeleteTenant deletes a tenant by id.
+func DeleteTenant(ctx context.Context, id string) error {
+	var uri string
+	var err error
+
+	uri = fmt.Sprintf("%s/%s/tenant/%s", url, path, id)
+	err = client.send(ctx, uri, http.MethodDelete, "application/json", nil, nil)
 
 	return err
 }
