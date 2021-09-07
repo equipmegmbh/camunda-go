@@ -368,7 +368,7 @@ type ProcessDefinitionRestart struct {
 }
 
 type ProcessInstance struct {
-	// The id of the process definition.
+	// The id of the process instance.
 	Id string `json:"id,omitempty"`
 
 	// The id of the process definition.
@@ -394,6 +394,70 @@ type ProcessInstance struct {
 
 	// An object containing a property for each of the latest variables.
 	Variables map[string]*Variable `json:"variables,omitempty"`
+}
+
+type HistoricProcessInstance struct {
+	// The id of the process instance.
+	Id string `json:"id,omitempty"`
+
+	// The process instance id of the root process instance that initiated the process.
+	RootProcessInstanceId string `json:"rootProcessInstanceId,omitempty"`
+
+	// The id of the parent process instance, if it exists.
+	SuperProcessInstanceId string `json:"superProcessInstanceId,omitempty"`
+
+	// The id of the parent case instance, if it exists.
+	SuperCaseInstanceId string `json:"superCaseInstanceId,omitempty"`
+
+	// The id of the parent case instance, if it exists.
+	CaseInstanceId string `json:"caseInstanceId,omitempty"`
+
+	// The name of the process definition that this process instance belongs to.
+	ProcessDefinitionName string `json:"processDefinitionName,omitempty"`
+
+	// The key of the process definition that this process instance belongs to.
+	ProcessDefinitionKey string `json:"processDefinitionKey,omitempty"`
+
+	// The version of the process definition that this process instance belongs to.
+	ProcessDefinitionVersion string `json:"processDefinitionVersion,omitempty"`
+
+	// The id of the process definition that this process instance belongs to.
+	ProcessDefinitionId string `json:"processDefinitionId,omitempty"`
+
+	// The business key of the process instance.
+	BusinessKey string `json:"businessKey,omitempty"`
+
+	// The time the instance was started. Default format* yyyy-MM-dd’T’HH:mm:ss.SSSZ.
+	StartTime string `json:"startTime,omitempty"`
+
+	// The time the instance ended. Default format* yyyy-MM-dd’T’HH:mm:ss.SSSZ.
+	EndTime string `json:"endTime,omitempty"`
+
+	// The time after which the instance should be removed by the History Cleanup job. Default format* yyyy-MM-dd’T’HH:mm:ss.SSSZ.
+	RemovalTime string `json:"removalTime,omitempty"`
+
+	// The time the instance took to finish (in milliseconds).
+	DurationInMillis string `json:"durationInMillis,omitempty"`
+
+	// The id of the user who started the process instance.
+	StartUserId string `json:"startUserId,omitempty"`
+
+	// The id of the initial activity that was executed (e.g., a start event).
+	StartActivityId string `json:"startActivityId,omitempty"`
+
+	// The provided delete reason in case the process instance was canceled during execution.
+	DeleteReason string `json:"deleteReason,omitempty"`
+
+	// The tenant id of the process instance.
+	TenantId string `json:"tenantId,omitempty"`
+
+	//last state of the process instance, possible values are:
+	//ACTIVE - running process instance
+	//SUSPENDED - suspended process instances
+	//COMPLETED - completed through normal end event
+	//EXTERNALLY_TERMINATED - terminated externally, for instance through REST API
+	//INTERNALLY_TERMINATED - terminated internally, for instance by terminating boundary event
+	State string `json:"state,omitempty"`
 }
 
 type ProcessInstanceQuery struct {

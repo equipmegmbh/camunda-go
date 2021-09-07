@@ -447,6 +447,23 @@ func GetProcessInstance(ctx context.Context, id string) (*ProcessInstance, error
 	return result, err
 }
 
+// GetHistoricProcessInstance Retrieves a historic process instance by id, according to the HistoricProcessInstance interface in the engine.
+func GetHistoricProcessInstance(ctx context.Context, id string) (*HistoricProcessInstance, error) {
+	var uri string
+	var err error
+
+	result := new(HistoricProcessInstance)
+
+	uri = fmt.Sprintf("%s/%s/history/process-instance/%s", url, path, id)
+	err = client.send(ctx, uri, http.MethodGet, "application/json", nil, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}
+
 // DeleteProcessInstance deletes a running process instance by id.
 func DeleteProcessInstance(ctx context.Context, id string) error {
 	var uri string
