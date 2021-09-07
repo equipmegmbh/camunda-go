@@ -419,7 +419,7 @@ type HistoricProcessInstance struct {
 	ProcessDefinitionKey string `json:"processDefinitionKey,omitempty"`
 
 	// The version of the process definition that this process instance belongs to.
-	ProcessDefinitionVersion string `json:"processDefinitionVersion,omitempty"`
+	ProcessDefinitionVersion int `json:"processDefinitionVersion,omitempty"`
 
 	// The id of the process definition that this process instance belongs to.
 	ProcessDefinitionId string `json:"processDefinitionId,omitempty"`
@@ -437,7 +437,7 @@ type HistoricProcessInstance struct {
 	RemovalTime string `json:"removalTime,omitempty"`
 
 	// The time the instance took to finish (in milliseconds).
-	DurationInMillis string `json:"durationInMillis,omitempty"`
+	DurationInMillis int `json:"durationInMillis,omitempty"`
 
 	// The id of the user who started the process instance.
 	StartUserId string `json:"startUserId,omitempty"`
