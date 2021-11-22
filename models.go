@@ -981,6 +981,15 @@ type Variable struct {
 	ValueInfo interface{} `json:"valueInfo,omitempty"`
 }
 
+// For serialized variables of type Object, the following properties can be provided:
+type ObjectValueInfo struct {
+	// A string representation of the object's type name.
+	ObjectTypeName          string `json:"objectTypeName,omitempty"`
+
+	// The serialization format used to store the variable.
+	SerializationDataFormat string `json:"serializationDataFormat,omitempty"`
+}
+
 func (e *Error) Error() string {
 	return fmt.Sprintf("type %s, message: %s", e.Type, e.Message)
 }
